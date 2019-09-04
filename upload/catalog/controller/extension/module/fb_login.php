@@ -13,19 +13,6 @@ class ControllerExtensionModuleFbLogin extends Controller {
 
         $data['location_code'] = $this->config->get('module_fb_login_app_loc');
 
-        /* fixes for our system */
-        //var_dump($this->request->get['route']);
-        $data['act_page'] = '';
-        if ($this->request->get['route'] == 'account/register') {
-            $data['act_page'] = 'register';
-            $data['text_facebook'] = $this->language->get('text_facebook_reg');
-        } elseif ($this->request->get['route'] == 'extension/quickcheckout/checkout') {
-            $data['act_page'] = 'checkout';
-            $data['text_facebook'] = $this->language->get('text_facebook_chk');
-        } elseif ($this->request->get['route'] == 'account/login') {
-            $data['act_page'] = 'login';
-        }
-
         return $this->load->view('extension/module/fb_login', $data);
     }
 
@@ -37,8 +24,6 @@ class ControllerExtensionModuleFbLogin extends Controller {
         
         $json = array();
         $data = array();
-
-        //var_dump($this->request->get);
 
         if (!isset($this->request->get['email']) || $this->request->get['email'] == 'undefined') {
 			$json['error'][] = $this->language->get('error_email');

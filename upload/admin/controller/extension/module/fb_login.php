@@ -10,7 +10,6 @@ class ControllerExtensionModuleFbLogin extends Controller {
 		$this->load->model('setting/setting');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			//$this->model_setting_setting->editSetting('fb_login', $this->request->post);
 			$this->model_setting_setting->editSetting('module_fb_login', $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -59,10 +58,8 @@ class ControllerExtensionModuleFbLogin extends Controller {
 
 		if (isset($this->request->post['module_fb_login_status'])) {
             $data['module_fb_login_status'] = $this->request->post['module_fb_login_status'];
-			//$data['fb_login_status'] = $this->request->post['fb_login_status'];
 		} else {
             $data['module_fb_login_status'] = $this->config->get('module_fb_login_status');
-			//$data['fb_login_status'] = $this->config->get('fb_login_status');
         }
 
         if (isset($this->request->post['module_fb_login_app_id'])) {

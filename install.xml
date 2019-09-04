@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <modification>
-  <name>Add Login Button Facebook on Login Page And Checkout Page</name>
-  <code>Add Login Button Facebook on Login Page And Checkout Page</code>
+  <name>Facebook Login</name>
+  <code>Donatis OCmods</code>
   <version>1.0</version>
-  <author>Davidev</author>
-  <link>http://www.davidev.it</link>
+  <author>Donatis</author>
+  <link></link>
 	<file path="catalog/controller/account/login.php">
 		<operation>
 			<search index="0"><![CDATA[$this->response->setOutput($this->load->view('account/login', $data));]]></search>
@@ -12,6 +13,15 @@
 			]]></add>
 		</operation>
 	</file>
+	<file path="catalog/view/theme/*/template/account/login.twig">
+		<operation>
+			<search index="0"><![CDATA[<div class="row">]]></search>
+			<add position="after"><![CDATA[
+            {{ fb_login }}
+			]]></add>
+		</operation>
+	</file>
+	
 	<file path="catalog/controller/account/register.php">
 		<operation>
 			<search index="0"><![CDATA[$this->response->setOutput($this->load->view('account/register', $data));]]></search>
@@ -20,15 +30,6 @@
 			]]></add>
 		</operation>
 	</file>
-    <file path="catalog/view/theme/*/template/account/login.twig">
-		<operation>
-			<search index="0"><![CDATA[<div class="row">]]></search>
-			<add position="after"><![CDATA[
-            {{ fb_login }}
-			]]></add>
-		</operation>
-	</file>
-
 	<file path="catalog/view/theme/*/template/account/register.twig">
 		<operation>
 			<search index="0"><![CDATA[<div class="row">]]></search>

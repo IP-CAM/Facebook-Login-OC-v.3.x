@@ -16,98 +16,98 @@ class ControllerExtensionModuleFbLogin extends Controller {
         return $this->load->view('extension/module/fb_login', $data);
     }
 
-    public function fblogin(){
-
+    public function fblogin()
+    {
         $this->load->language('extension/module/fb_login');
         $this->load->model('account/customer');
         $this->load->model('account/activity');
-        
+
         $json = array();
         $data = array();
 
         if (!isset($this->request->get['email']) || $this->request->get['email'] == 'undefined') {
-			$json['error'][] = $this->language->get('error_email');
+            $json['error'][] = $this->language->get('error_email');
         }
 
         if (!isset($this->request->get['fname'])) {
-			$json['error'][] = $this->language->get('error_fname');
+            $json['error'][] = $this->language->get('error_fname');
         }
-        
+
         if (!isset($this->request->get['lname'])) {
-			$json['error'][] = $this->language->get('error_lname');
+            $json['error'][] = $this->language->get('error_lname');
         }
-        
+
         if (!isset($this->request->get['fb_id'])) {
-			$json['error'][] = $this->language->get('error_fb_id');
-		}
+            $json['error'][] = $this->language->get('error_fb_id');
+        }
 
         if (!$json) {
-
             $customer_info = $this->model_account_customer->getCustomerByEmail($this->request->get['email']);
-            if(!empty($customer_info)){ //Customer already registered , Only Log in the customer
-                if ($customer_info && $this->customer->login($customer_info['email'],$this->request->get['fb_id'])) {
+
+            // Customer already registered , Only Log in the customer
+            if (!empty($customer_info)) {
+                if ($customer_info && $this->customer->login($customer_info['email'], '', true)) {
+                    // Unset guest
+                    unset($this->session->data['guest']);
+
                     // Default Addresses
                     $this->load->model('account/address');
 
                     if ($this->config->get('config_tax_customer') == 'payment') {
-                            $this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
+                        $this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
 
                     if ($this->config->get('config_tax_customer') == 'shipping') {
-                            $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
+                        $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
+
+                    $this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
                 }
                 if ($this->customer->isLogged()) {
-                    $this->model_account_activity->addActivity('login',array(
-                        'customer_id'   => $customer_info['customer_id'],
-                        'Name'          => 'FB: '. $this->request->get['fname'] . ' ' . $this->request->get['lname']
+                    $this->model_account_activity->addActivity('login', array(
+                        'customer_id' => $customer_info['customer_id'],
+                        'name' => 'FB: ' . $this->request->get['fname'] . ' ' . $this->request->get['lname']
                     ));
+
                     $json['success'] = 'login';
                 } else {
                     $json['error'][] = $this->language->get('error_login');
                 }
-            } else{
-
-                $data['email'] = $this->request->get['email'];
+                // Create new customer account
+            } else {
                 $data['firstname'] = $this->request->get['fname'];
                 $data['lastname'] = $this->request->get['lname'];
+                $data['email'] = $this->request->get['email'];
                 $data['telephone'] = '';
-                $data['fax'] = '';
-                $data['password'] = '';
-                $data['company'] = '';
-                $data['address_1'] = '';
-                $data['address_2'] = '';
-                $data['city'] = '';
-                $data['postcode'] = '';
-                $data['country_id'] = '';
-                $data['zone_id'] = '';
-                $data['password'] = $this->request->get['fb_id'];
-                
+                $data['password'] = rand(10000, 99999);
+
                 $customer_id = $this->model_account_customer->addCustomer($data);
 
-                if ($customer_id && $this->customer->login($data['email'], '', true)) {
+                if ($customer_id && $this->customer->login($data['email'], $data['password'])) {
+                    // Unset guest
+                    unset($this->session->data['guest']);
+
                     // Default Addresses
                     $this->load->model('account/address');
 
                     if ($this->config->get('config_tax_customer') == 'payment') {
-                            $this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
+                        $this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
 
                     if ($this->config->get('config_tax_customer') == 'shipping') {
-                            $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
+                        $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
+
+                    $this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
                 }
 
                 if ($this->customer->isLogged()) {
                     $json['success'] = 'register';
-                } else{
+                } else {
                     $json['error'][] = $this->language->get('error_register');
                 }
 
             }
         }
-
-        $this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
     }
 }

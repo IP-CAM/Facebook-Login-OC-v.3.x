@@ -61,7 +61,7 @@ class ControllerExtensionModuleFbLogin extends Controller {
                         $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
 
-                    $this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
+                    $this->model_account_customer->deleteLoginAttempts($customer_info['email']);
                 }
                 if ($this->customer->isLogged()) {
                     $this->model_account_activity->addActivity('login', array(
@@ -97,8 +97,6 @@ class ControllerExtensionModuleFbLogin extends Controller {
                     if ($this->config->get('config_tax_customer') == 'shipping') {
                         $this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
                     }
-
-                    $this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
                 }
 
                 if ($this->customer->isLogged()) {
